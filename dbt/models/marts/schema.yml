@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: fct_city_daily
+    description: "Daily weather metrics for each configured city."
+
+    columns:
+      - name: city
+        description: "Configured city name."
+        tests:
+          - not_null
+
+      - name: date
+        description: "Weather observation date."
+        tests:
+          - not_null
+
+      - name: temperature_2m_avg
+        description: "Average of the daily maximum and minimum temperature."
+        tests:
+          - not_null
+
+      - name: precipitation_sum
+        description: "Total daily precipitation."

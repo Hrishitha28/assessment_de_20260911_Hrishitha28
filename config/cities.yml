@@ -1,0 +1,16 @@
+cities:
+  - name: Bengaluru
+    latitude: 12.9716
+    longitude: 77.5946
+
+  - name: Mumbai
+    latitude: 19.0760
+    longitude: 72.8777
+
+  - name: Delhi
+    latitude: 28.6139
+    longitude: 77.2090
+
+  - name: Hyderabad
+    latitude: 17.3840
+    longitude: 78.4564  

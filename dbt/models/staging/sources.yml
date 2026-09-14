@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: "Raw weather data loaded from the Open-Meteo historical API."
+
+    tables:
+      - name: weather_daily
+        description: "Daily weather observations for each configured city."

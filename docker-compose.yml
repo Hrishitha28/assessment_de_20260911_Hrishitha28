@@ -1,15 +1,15 @@
 services:
   postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-de}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-de}
-      POSTGRES_DB: ${POSTGRES_DB:-warehouse}
+    image: postgres:16-alpine    #Create a PostgreSQL 16 database container.
+    environment:                                              #The ${...:-...} syntax means:Use the value from .env if it exists; otherwise use the default.
+      POSTGRES_USER: ${POSTGRES_USER:-de}                     #username = de
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-de}             #password = de
+      POSTGRES_DB: ${POSTGRES_DB:-warehouse}                  #database = warehouse
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./sql/init:/docker-entrypoint-initdb.d:ro
+    volumes:                                                  #named Docker volume:pgdata
+      - pgdata:/var/lib/postgresql/data                       #Without it, deleting/recreating the PostgreSQL container could delete our database.
+      - ./sql/init:/docker-entrypoint-initdb.d:ro             #Take SQL files from our project's sql/init directory and make them available to PostgreSQL when the database is initialized.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-de} -d ${POSTGRES_DB:-warehouse}"]
       interval: 5s
@@ -26,7 +26,7 @@ services:
     environment: &pipeline_env
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-de}:${POSTGRES_PASSWORD:-de}@postgres:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-de}:${POSTGRES_PASSWORD:-de}@postgres:5432/airflow   #Airflow's metadata database connection.
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
       _AIRFLOW_WWW_USER_USERNAME: admin
       _AIRFLOW_WWW_USER_PASSWORD: admin
@@ -35,7 +35,8 @@ services:
       WAREHOUSE_DB: ${POSTGRES_DB:-warehouse}
       WAREHOUSE_USER: ${POSTGRES_USER:-de}
       WAREHOUSE_PASSWORD: ${POSTGRES_PASSWORD:-de}
-      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_PROFILES_DIR: /opt/airflow/dbt                #will allow dbt to find its configuration inside the container
+      PYTHONPATH: /opt/airflow
     volumes: &pipeline_volumes
       - ./dags:/opt/airflow/dags
       - ./ingestion:/opt/airflow/ingestion
@@ -61,7 +62,8 @@ services:
     ports:
       - "8888:8888"
     entrypoint: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser",
-                 "--ServerApp.token=", "--ServerApp.password=", "--ServerApp.root_dir=/opt/airflow"]
+            "--ServerApp.token=", "--ServerApp.password=", "--ServerApp.root_dir=/opt/airflow",
+            "--ServerApp.disable_check_xsrf=True"]
 
 volumes:
   pgdata:
