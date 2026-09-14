@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import date, timedelta
 import os
 import psycopg2
 import requests
@@ -133,3 +134,18 @@ def normalize_weather(city: dict, response: dict) -> dict:
         "precipitation_sum": daily["precipitation_sum"][0],
         "wind_speed_10m_max": daily["wind_speed_10m_max"][0],
     }
+def run_ingestion_range(
+    config_path: str | Path,
+    start_date: str,
+    end_date: str,
+) -> None:
+    current_date = date.fromisoformat(start_date)
+    final_date = date.fromisoformat(end_date)
+
+    while current_date <= final_date:
+        rows = extract_weather(
+            config_path,
+            current_date.isoformat(),
+        )
+        load_weather_rows(rows)
+        current_date += timedelta(days=1)
